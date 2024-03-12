@@ -1,4 +1,4 @@
-import { Schema, model } from 'mongoose';
+import { Schema, Types, model } from 'mongoose';
 
 const postSchema = new Schema({
   title: {
@@ -14,7 +14,8 @@ const postSchema = new Schema({
     required: true
   },
   creator: {
-    type: Object,
+    type: Types.ObjectId,
+    ref: 'User',
     required: true
   }
 }, {

@@ -5,6 +5,7 @@ import { join, dirname } from 'path';
 import { validationResult } from 'express-validator'
 
 import Post from '../models/post.js';
+import User from '../models/user.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -51,21 +52,29 @@ const createPost = (req, res, next) => {
   }
 
   const { title, content } = req.body;
+  let creator;
 
   const post = new Post({
     title,
     content,
     imageUrl: req.file.path,
-    creator: {
-      name: 'Cristian'
-    }
+    creator: req.userId
   });
 
   post.save()
     .then(result => {
+      return User.findById(req.userId);
+    })
+    .then(user => {
+      creator = user;
+      user.posts.push(post);
+      return user.save();
+    })
+    .then(result => {
       res.status(201).json({
         message: 'Post created',
-        post: result
+        post,
+        creator: { ...creator }
       });
     })
     .catch(error => {
@@ -130,6 +139,12 @@ const updatePost = (req, res, next) => {
         throw error;
       }
 
+      if (post.creator.toString() !== req.userId) {
+        const error = new Error('Not authorized.');
+        error.statusCode = 403;
+        throw error;
+      }
+
       if (imageUrl !== post.imageUrl) {
         clearImage(post.imageUrl);
       }
@@ -162,9 +177,22 @@ const deletePost = (req, res, next) => {
         throw error;
       }
 
+      if (post.creator.toString() !== req.userId) {
+        const error = new Error('Not authorized.');
+        error.statusCode = 403;
+        throw error;
+      }
+
       // Check logged in user
       clearImage(post.imageUrl);
       return Post.findByIdAndDelete(postId);
+    })
+    .then(result => {
+      return User.findById(req.userId);
+    })
+    .then(user => {
+      user.posts.pull(postId);
+      return user.save();
     })
     .then(result => {
       console.log(result);

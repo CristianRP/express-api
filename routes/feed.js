@@ -8,11 +8,12 @@ import {
   getPosts,
   updatePost
 } from '../controllers/feed.js';
+import isAuth from '../middleware/is-auth.js';
 
 const router = express.Router();
 
 // GET /feed/posts
-router.get('/posts', getPosts);
+router.get('/posts', isAuth, getPosts);
 
 // POST /feed/posts
 router.post(
@@ -25,10 +26,11 @@ router.post(
       .trim()
       .isLength({ min: 5 })
   ],
+  isAuth,
   createPost
 );
 
-router.get('/posts/:postId', getPost);
+router.get('/posts/:postId', isAuth, getPost);
 
 router.put(
   '/posts/:postId',
@@ -40,9 +42,10 @@ router.put(
       .trim()
       .isLength({ min: 5 })
   ],
+  isAuth,
   updatePost
 );
 
-router.delete('/posts/:postId', deletePost);
+router.delete('/posts/:postId', isAuth, deletePost);
 
 export default router;
