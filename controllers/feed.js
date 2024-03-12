@@ -1,46 +1,92 @@
 import { validationResult } from 'express-validator'
 
+import Post from '../models/post.js';
+
 const getPosts = (req, res, next) => {
-  res.status(200).json({
-    posts: [{
-      _id: 123,
-      title: 'First Post',
-      content: 'This is the first post!',
-      imageUrl: 'images/duck.jpg',
-      creator: {
-        name: 'Cristian',
-      },
-      date: new Date()
-    }]
-  });
+  Post.find()
+    .then(posts => {
+      res.status(200).json({
+        message: 'Fetched posts successfully',
+        posts
+      });
+    })
+    .catch(error => {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
+    });
 };
 
 const createPost = (req, res, next) => {
   const errors = validationResult(req);
 
   if (!errors.isEmpty()) {
-    return res.status(422)  
-      .json({
-        message: 'Validation failed',
-        errors: errors.array()
-      })
+    const error = new Error('Validation failed');
+    error.statusCode = 422;
+    throw error;
   }
 
   const { title, content } = req.body;
-  // create post in db
-  res.status(201).json({
-    message: 'Post created',
-    post: {
-      _id: new Date().toISOString(),
-      title,
-      content,
-      creator: { name: 'Cristian' },
-      createdAt: new Date()
+
+  const post = new Post({
+    title,
+    content,
+    imageUrl: 'images/duck.jpg',
+    creator: {
+      name: 'Cristian'
     }
   });
+
+  post.save()
+    .then(result => {
+      res.status(201).json({
+        message: 'Post created',
+        post: result
+        //  {
+        //   _id: new Date().toISOString(),
+        //   title,
+        //   content,
+        //   creator: { name: 'Cristian' },
+        //   createdAt: new Date()
+        // }
+      });
+    })
+    .catch(error => {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
+    });
 };
+
+const getPost = (req, res, next) => {
+  const { postId } = req.params;
+  console.log(postId);
+  Post.findById(postId)
+    .then(post => {
+      if (!post) {
+        const error = new Error('Cound not find post.');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      res.status(200)
+        .json({
+          message: 'Post fetched',
+          post
+        });
+    })
+    .catch(error => {
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
+    })
+}
 
 export {
   getPosts,
-  createPost
+  createPost,
+  getPost
 }

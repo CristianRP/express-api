@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 
 import {
   createPost,
+  getPost,
   getPosts
 } from '../controllers/feed.js';
 
@@ -17,12 +18,14 @@ router.post(
   [
     body('title')
       .trim()
-      .isLength({ min: 5 }),
+      .isLength({ min: 7 }),
     body('content')
       .trim()
       .isLength({ min: 5 })
   ],
   createPost
 );
+
+router.get('/posts/:postId', getPost);
 
 export default router;
