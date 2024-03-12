@@ -1,7 +1,10 @@
 import express from 'express';
 import bodyParser from 'body-parser';
+import mongoose from 'mongoose';
 
 import feedRoutes from './routes/feed.js';
+
+const MONGODB_URI = 'mongodb+srv://cristianramirezgt:291fWV8RTsNeQPtc@clusternodejs.u8wma2f.mongodb.net/messages?retryWrites=true&w=majority&appName=ClusterNodeJS';
 
 const app = express();
 
@@ -17,4 +20,10 @@ app.use((req, res, next) => {
 
 app.use('/feed', feedRoutes);
 
-app.listen(8080);
+mongoose.connect(
+  MONGODB_URI
+)
+.then(() => {
+  app.listen(8080);
+})
+.catch(console.error);
