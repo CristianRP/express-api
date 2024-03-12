@@ -27,12 +27,18 @@ const createPost = (req, res, next) => {
     throw error;
   }
 
+  if (!req.file) {
+    const error = new Error('No image provided.');
+    error.statusCode = 422;
+    throw error;
+  }
+
   const { title, content } = req.body;
 
   const post = new Post({
     title,
     content,
-    imageUrl: 'images/duck.jpg',
+    imageUrl: req.file.path,
     creator: {
       name: 'Cristian'
     }
@@ -43,13 +49,6 @@ const createPost = (req, res, next) => {
       res.status(201).json({
         message: 'Post created',
         post: result
-        //  {
-        //   _id: new Date().toISOString(),
-        //   title,
-        //   content,
-        //   creator: { name: 'Cristian' },
-        //   createdAt: new Date()
-        // }
       });
     })
     .catch(error => {

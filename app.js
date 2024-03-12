@@ -4,6 +4,7 @@ import { join, dirname } from 'path';
 import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
+import multer from 'multer';
 
 import feedRoutes from './routes/feed.js';
 
@@ -11,9 +12,31 @@ const MONGODB_URI = 'mongodb+srv://cristianramirezgt:291fWV8RTsNeQPtc@clusternod
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
+const fileStorage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, 'images');
+  },
+  filename: (req, file, cb) => {
+    cb(null, new Date().toISOString() + '-' + file.originalname);
+  }
+});
+
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype === 'image/png' || file.mimetype === 'image/jpg' || file.mimetype === 'image/jpeg') {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+}
+
 const app = express();
 
 app.use(bodyParser.json()); // application/json
+app.use(multer({
+    storage: fileStorage,
+    fileFilter
+  }).single('image')
+);
 app.use('/images', express.static(join(__dirname, 'images')));
 
 app.use((req, res, next) => {
