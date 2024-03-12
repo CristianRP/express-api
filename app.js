@@ -8,6 +8,7 @@ import multer from 'multer';
 
 import feedRoutes from './routes/feed.js';
 import authRoutes from './routes/auth.js';
+import userRoutes from './routes/user.js';
 
 const MONGODB_URI = 'mongodb+srv://cristianramirezgt:291fWV8RTsNeQPtc@clusternodejs.u8wma2f.mongodb.net/messages?retryWrites=true&w=majority&appName=ClusterNodeJS';
 const __filename = fileURLToPath(import.meta.url);
@@ -50,6 +51,7 @@ app.use((req, res, next) => {
 
 app.use('/feed', feedRoutes);
 app.use('/auth', authRoutes);
+app.use(userRoutes);
 
 app.use((error, req, res, next) => {
   console.log(error);
