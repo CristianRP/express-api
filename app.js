@@ -70,7 +70,7 @@ mongoose.connect(
 .then(() => {
   const server = app.listen(8080);
   init(server);
-  const io = getIO()
+  const io = getIO();
   
   io.on('connection', (socket) => {
     console.log('Client connected');
