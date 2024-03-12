@@ -9,6 +9,7 @@ import multer from 'multer';
 import feedRoutes from './routes/feed.js';
 import authRoutes from './routes/auth.js';
 import userRoutes from './routes/user.js';
+import { getIO, init } from './socket.js';
 
 const MONGODB_URI = 'mongodb+srv://cristianramirezgt:291fWV8RTsNeQPtc@clusternodejs.u8wma2f.mongodb.net/messages?retryWrites=true&w=majority&appName=ClusterNodeJS';
 const __filename = fileURLToPath(import.meta.url);
@@ -67,6 +68,12 @@ mongoose.connect(
   MONGODB_URI
 )
 .then(() => {
-  app.listen(8080);
+  const server = app.listen(8080);
+  init(server);
+  const io = getIO()
+  
+  io.on('connection', (socket) => {
+    console.log('Client connected');
+  });
 })
 .catch(console.error);
