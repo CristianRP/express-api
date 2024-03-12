@@ -142,6 +142,35 @@ const updatePost = (req, res, next) => {
     });
 }
 
+const deletePost = (req, res, next) => {
+  const { postId } = req.params;
+  Post.findById(postId)
+    .then(post => {
+      if (!post) {
+        const error = new Error('Cound not find post.');
+        error.statusCode = 404;
+        throw error;
+      }
+
+      // Check logged in user
+      clearImage(post.imageUrl);
+      return Post.findByIdAndDelete(postId);
+    })
+    .then(result => {
+      console.log(result);
+      res.status(200).json({
+        message: 'Post deleted'
+      });
+    })
+    .catch(error => {
+      console.log(error);
+      if (!error.statusCode) {
+        error.statusCode = 500;
+      }
+      next(error);
+    });
+}
+
 const clearImage = filePath => {
   filePath = join(__dirname, '..', filePath);
   fs.unlink(filePath, err => console.log(err));
@@ -151,5 +180,6 @@ export {
   getPosts,
   createPost,
   getPost,
-  updatePost
+  updatePost,
+  deletePost
 }

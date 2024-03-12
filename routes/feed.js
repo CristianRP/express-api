@@ -3,6 +3,7 @@ import { body } from 'express-validator';
 
 import {
   createPost,
+  deletePost,
   getPost,
   getPosts,
   updatePost
@@ -41,5 +42,7 @@ router.put(
   ],
   updatePost
 );
+
+router.delete('/posts/:postId', deletePost);
 
 export default router;
