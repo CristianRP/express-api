@@ -6,7 +6,7 @@ import { validationResult } from 'express-validator'
 
 import Post from '../models/post.js';
 import User from '../models/user.js';
-import { getIO as io } from '../socket.js';
+// import { getIO as io } from '../socket.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -67,10 +67,10 @@ const createPost = async (req, res, next) => {
 
     await user.save();
 
-    io().emit('posts', {
-      action: 'create',
-      post: { ...post._doc, creator: { ...user._doc } }
-    });
+    // io().emit('posts', {
+    //   action: 'create',
+    //   post: { ...post._doc, creator: { ...user._doc } }
+    // });
 
     res.status(201).json({
       message: 'Post created',
@@ -151,10 +151,10 @@ const updatePost = async (req, res, next) => {
 
     const updatedPost = await Post.findByIdAndUpdate(post._id, { title, content, imageUrl }, { new: true });
 
-    io().emit('posts', {
-      action: 'update',
-      post: updatedPost
-    });
+    // io().emit('posts', {
+    //   action: 'update',
+    //   post: updatedPost
+    // });
 
     res.status(200).json({
       message: 'Post updated',
@@ -192,10 +192,10 @@ const deletePost = async (req, res, next) => {
     user.posts.pull(postId);
     await user.save();
 
-    io().emit('posts', {
-      action: 'delete',
-      post: postId
-    });
+    // io().emit('posts', {
+    //   action: 'delete',
+    //   post: postId
+    // });
 
     res.status(200).json({
       message: 'Post deleted'

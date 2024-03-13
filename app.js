@@ -5,11 +5,12 @@ import express from 'express';
 import bodyParser from 'body-parser';
 import mongoose from 'mongoose';
 import multer from 'multer';
+import { createHandler } from 'graphql-http/lib/use/express';
 
-import feedRoutes from './routes/feed.js';
-import authRoutes from './routes/auth.js';
-import userRoutes from './routes/user.js';
-import { getIO, init } from './socket.js';
+import graphqlSchema from './graphql/schema.js';
+import rootValue from './graphql/resolvers.js';
+
+// import { init } from './socket.js';
 
 const MONGODB_URI = 'mongodb+srv://cristianramirezgt:291fWV8RTsNeQPtc@clusternodejs.u8wma2f.mongodb.net/messages?retryWrites=true&w=majority&appName=ClusterNodeJS';
 const __filename = fileURLToPath(import.meta.url);
@@ -43,16 +44,16 @@ app.use(multer({
 app.use('/images', express.static(join(__dirname, 'images')));
 
 app.use((req, res, next) => {
-  console.log('load');
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
   next();
 });
 
-app.use('/feed', feedRoutes);
-app.use('/auth', authRoutes);
-app.use(userRoutes);
+app.use('/graphql', createHandler({
+  schema: graphqlSchema,
+  rootValue
+}))
 
 app.use((error, req, res, next) => {
   console.log(error);
@@ -68,12 +69,12 @@ mongoose.connect(
   MONGODB_URI
 )
 .then(() => {
-  const server = app.listen(8080);
-  init(server);
-  const io = getIO();
+  app.listen(8080);
+  // init(server);j
+  // const io = getIO();
   
-  io.on('connection', (socket) => {
-    console.log('Client connected');
-  });
+  // io.on('connection', (socket) => {
+  //   console.log('Client connected');
+  // });
 })
 .catch(console.error);
