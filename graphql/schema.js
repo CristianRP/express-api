@@ -45,15 +45,16 @@ export default buildSchema(`
   type RootMutation {
     createUser(userInput: UserData): User!
     createPost(postInput: PostData): Post!
-  }
-
-  type Hello {
-    text: String
+    updatePost(id: ID!, postInput: PostData) : Post!
+    deletePost(id: ID!): Boolean
+    updateStatus(status: String!): User!
   }
 
   type RootQuery {
     login(email: String!, password: String!): AuthData!
     posts(page: Int!): PostResult!
+    post(id: ID!): Post!
+    user: User!
   }
 
   schema {
