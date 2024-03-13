@@ -31,8 +31,20 @@ export default buildSchema(`
     password: String!
   }
   
+  input PostData {
+    title: String!
+    content: String!
+    imageUrl: String!
+  }
+
+  type PostResult {
+    posts: [Post!]!
+    totalPosts: Int!
+  }
+
   type RootMutation {
     createUser(userInput: UserData): User!
+    createPost(postInput: PostData): Post!
   }
 
   type Hello {
@@ -41,6 +53,7 @@ export default buildSchema(`
 
   type RootQuery {
     login(email: String!, password: String!): AuthData!
+    posts(page: Int!): PostResult!
   }
 
   schema {

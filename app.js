@@ -9,6 +9,7 @@ import { createHandler } from 'graphql-http/lib/use/express';
 
 import graphqlSchema from './graphql/schema.js';
 import rootValue from './graphql/resolvers.js';
+import auth from './middleware/auth.js';
 
 // import { init } from './socket.js';
 
@@ -53,18 +54,23 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/graphql', createHandler({
-  schema: graphqlSchema,
-  rootValue,
-  formatError(err) {
-    if (!err.originalError) {
-      return err;
-    }
-    const { data, code } = err.originalError;
-    const message = err.message || 'An error ocurred';
-    return { message, status: code, data };
-  }
-}))
+app.use(auth);
+
+app.use('/graphql', (req, res) => {
+  createHandler({
+    schema: graphqlSchema,
+    rootValue,
+    formatError(err) {
+      if (!err.originalError) {
+        return err;
+      }
+      const { data, code } = err.originalError;
+      const message = err.message || 'An error ocurred';
+      return { message, status: code, data };
+    },
+    context: { req, res }
+  })(req, res);
+})
 
 app.use((error, req, res, next) => {
   console.log(error);
