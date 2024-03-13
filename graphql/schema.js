@@ -19,6 +19,11 @@ export default buildSchema(`
     status: String!
     posts: [Post!]!
   }
+
+  type AuthData {
+    token: String!
+    userId: String!
+  }
   
   input UserData {
     email: String!
@@ -35,7 +40,7 @@ export default buildSchema(`
   }
 
   type RootQuery {
-    hello: Hello
+    login(email: String!, password: String!): AuthData!
   }
 
   schema {

@@ -45,14 +45,25 @@ app.use('/images', express.static(join(__dirname, 'images')));
 
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE');
+  res.setHeader('Access-Control-Allow-Methods', 'OPTIONS, GET, POST, PUT, PATCH, DELETE');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
   next();
 });
 
 app.use('/graphql', createHandler({
   schema: graphqlSchema,
-  rootValue
+  rootValue,
+  formatError(err) {
+    if (!err.originalError) {
+      return err;
+    }
+    const { data, code } = err.originalError;
+    const message = err.message || 'An error ocurred';
+    return { message, status: code, data };
+  }
 }))
 
 app.use((error, req, res, next) => {
