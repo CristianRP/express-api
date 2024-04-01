@@ -14,7 +14,7 @@ import auth from './middleware/auth.js';
 
 // import { init } from './socket.js';
 
-const MONGODB_URI = 'mongodb+srv://cristianramirezgt:291fWV8RTsNeQPtc@clusternodejs.u8wma2f.mongodb.net/messages?retryWrites=true&w=majority&appName=ClusterNodeJS';
+const MONGODB_URI = process.env.MONGO_DB_CONNECTION_SRV;
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
